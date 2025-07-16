@@ -5,6 +5,7 @@ using UnityEngine;
 public class Projectile : MonoBehaviour
 {
     public float lifetime = 2f; // Tiempo antes de destruirse automáticamente
+    public int damage = 1;
 
     void Start()
     {
@@ -15,8 +16,12 @@ public class Projectile : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Enemy"))
         {
+            Enemy enemy = collision.gameObject.GetComponent<Enemy>();
+            if (enemy != null)
+            {
+                enemy.TakeDamage(damage);
+            }
             Destroy(gameObject);
-            // Aquí puedes agregar lógica para dañar al enemigo si lo deseas
         }
     }
 }

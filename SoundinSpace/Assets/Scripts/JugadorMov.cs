@@ -1,4 +1,6 @@
 using UnityEngine;
+using UnityEngine.UI;
+using TMPro;
 
 public class JugadorMov : MonoBehaviour
 {
@@ -6,16 +8,21 @@ public class JugadorMov : MonoBehaviour
     public Camera mainCamera;     // Cámara principal
     public GameObject projectilePrefab; // Prefab del proyectil
     public Transform firePoint;         // Punto de salida del disparo
-    public float projectileSpeed = 20f; // Velocidad del proyectil
-
+    public float projectileSpeed = 80f; // Velocidad del proyectil
     public float fireRate = 0.2f; // Tiempo entre disparos en segundos
     private float fireTimer = 0f;
+    public GameObject strongProjectilePrefab; // Prefab de la bala especial
+    public float strongProjectileSpeed = 100f; // Velocidad de la bala especial
+    public float strongFireRate = 0.1f; // Tiempo entre disparos especiales
+    private float strongFireTimer = 0f;
+    public RawImage strongMissileImage;
 
     void Update()
     {
         HandleMovement();
         HandleRotation();
-        HandleShooting(); // <-- Agregado
+        HandleShooting();         // Autoshoot
+        HandleStrongShooting();   // Disparo especial
     }
 
     void HandleMovement()
@@ -47,6 +54,11 @@ public class JugadorMov : MonoBehaviour
 
     void HandleShooting()
     {
+        if (strongMissileImage != null)
+        {
+            strongMissileImage.enabled = strongFireTimer >= strongFireRate;
+        }
+
         fireTimer += Time.deltaTime;
         if (fireTimer >= fireRate)
         {
@@ -61,6 +73,22 @@ public class JugadorMov : MonoBehaviour
             }
 
             fireTimer = 0f; // Reinicia el temporizador
+        }
+    }
+    void HandleStrongShooting()
+    {
+        strongFireTimer += Time.deltaTime;
+        if (Input.GetMouseButtonDown(0) && strongFireTimer >= strongFireRate)
+        {
+            GameObject projectile = Instantiate(strongProjectilePrefab, firePoint.position, firePoint.rotation);
+
+            Rigidbody rb = projectile.GetComponent<Rigidbody>();
+            if (rb != null)
+            {
+                rb.velocity = firePoint.forward * strongProjectileSpeed;
+            }
+
+            strongFireTimer = 0f; // Reinicia el temporizador especial
         }
     }
 }
